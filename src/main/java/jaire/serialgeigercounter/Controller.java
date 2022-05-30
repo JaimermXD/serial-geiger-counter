@@ -104,8 +104,12 @@ public class Controller implements Initializable {
         String[] portNames = getPorts();
         portsDropdown.getItems().addAll(portNames);
 
-        if (portNames.length > 0) portsDropdown.setValue(portNames[0]);
-        else portsDropdown.setValue("None");
+        if (portNames.length > 0) {
+            portsDropdown.setValue(portNames[0]);
+        } else {
+            portsDropdown.getItems().add("None");
+            portsDropdown.setValue("None");
+        }
     }
 
     @FXML
