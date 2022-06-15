@@ -3,23 +3,38 @@ package jaire.serialgeigercounter;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.fazecast.jSerialComm.SerialPortMessageListener;
+import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
@@ -59,8 +74,11 @@ public class Controller implements Initializable {
 
     public SerialPort selectedPort;
     private final Queue<Map<String, Object>> readings = new ConcurrentLinkedQueue<>();
-    public final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private Future<?> future;
+    private HostServices hostServices;
+    private Stage mainStage;
+    private Path outputDir = Paths.get(new JFileChooser().getFileSystemView().getDefaultDirectory().toString(), "serial-geiger-counter");
     private final int maxReadingsDisplayed = 40;
 
     @Override
@@ -196,7 +214,8 @@ public class Controller implements Initializable {
         }, 0, 200, TimeUnit.MILLISECONDS);
     }
 
-    public void disconnect(ActionEvent e) {
+    @FXML
+    private void disconnect(ActionEvent e) {
         if (selectedPort == null) return;
 
         selectedPort.closePort();
@@ -239,12 +258,104 @@ public class Controller implements Initializable {
         outputTextArea.clear();
     }
 
-    public void error(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message);
+    private void error(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+
+        stage.getIcons().clear();
+        alert.setHeaderText(null);
+        alert.setContentText(message);
         alert.showAndWait();
     }
 
     private void print(String message) {
         outputTextArea.setText(outputTextArea.getText() + message);
+    }
+
+    public void setStage(Stage stage) {
+        this.mainStage = stage;
+    }
+
+    @FXML
+    private void setOutputDirectory(ActionEvent e) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File directory = directoryChooser.showDialog(mainStage);
+
+        outputDir = Paths.get(directory.getAbsolutePath());
+    }
+
+    @FXML
+    private void saveChartImage(ActionEvent e) {
+        outputDir.toFile().mkdir();
+
+        String filename = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
+        WritableImage image = lineChart.snapshot(new SnapshotParameters(), null);
+        File file = new File(String.valueOf(Paths.get(String.valueOf(outputDir), String.format("%s.png", filename))));
+
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Chart Image Saved");
+            alert.setHeaderText(null);
+            alert.setContentText(String.format("Chart image successfully saved to %s", file));
+            alert.showAndWait();
+        } catch (IOException err) {
+            error("Unable to save chart image");
+        }
+    }
+
+    @FXML
+    private void saveOutputToFile(ActionEvent e) {
+        outputDir.toFile().mkdir();
+
+        String filename = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
+        File file = new File(String.valueOf(Paths.get(String.valueOf(outputDir), String.format("%s.txt", filename))));
+
+        try {
+            Files.write(file.toPath(), List.of(outputTextArea.getText().split("\n")), StandardCharsets.UTF_8);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Output Saved");
+            alert.setHeaderText(null);
+            alert.setContentText(String.format("Output successfully saved to %s", file));
+            alert.showAndWait();
+        } catch (IOException err) {
+            error("Unable to write output to file");
+        }
+    }
+
+    @FXML
+    public void exit(ActionEvent e) {
+        disconnect(null);
+        executor.shutdownNow();
+        Platform.exit();
+    }
+
+    public void setHostServices(HostServices hostServices) {
+        this.hostServices = hostServices;
+    }
+
+    @FXML
+    private void contribute(ActionEvent e) {
+        hostServices.showDocument("https://github.com/JaimermXD/serial-geiger-counter/");
+    }
+
+    @FXML
+    private void about(ActionEvent e) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png"), "No icon resource"), 100, 100, false, false);
+
+        alert.setGraphic(new ImageView(icon));
+        alert.setTitle("About");
+        alert.setHeaderText("Serial Geiger Counter v1.2.0");
+        alert.setContentText("""
+                Build date: June 6, 2022
+                Java version: 17.0.1
+                JavaFX version: 18.0.1
+                
+                Copyright © 2022 Jaime Redondo
+                """);
+        alert.showAndWait();
     }
 }
