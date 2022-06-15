@@ -2,11 +2,16 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -19,125 +24,149 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.chart.CategoryAxis?>
-<SplitPane dividerPositions="0.5376884422110553" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="538.0" prefWidth="797.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="jaire.serialgeigercounter.Controller">
-   <items>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
-         <children>
-            <LineChart fx:id="lineChart" layoutX="6.0" title="Radiation dose over time" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <xAxis>
-                <CategoryAxis label="Time (s)" prefHeight="45.0" side="BOTTOM" fx:id="xAxis">
-                   <opaqueInsets>
-                      <Insets />
-                   </opaqueInsets>
-                </CategoryAxis>
-              </xAxis>
-              <yAxis>
-                <NumberAxis fx:id="yAxis" label="Dose (CPM)" prefWidth="45.0" side="LEFT">
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </NumberAxis>
-              </yAxis>
-            </LineChart>
-         </children>
-      </AnchorPane>
-      <AnchorPane>
-         <children>
-            <GridPane alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" maxWidth="167.0" minWidth="10.0" percentWidth="25.0" prefWidth="109.0" />
-                <ColumnConstraints hgrow="ALWAYS" maxWidth="103.0" minWidth="10.0" percentWidth="75.0" prefWidth="91.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
-              </rowConstraints>
+
+<VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jaire.serialgeigercounter.Controller">
+   <children>
+      <MenuBar VBox.vgrow="ALWAYS">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#setOutputDirectory" text="Set output directory" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveChartImage" text="Save chart image" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveOutputToFile" text="Save output to file" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#contribute" text="Contribute" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <SplitPane dividerPositions="0.5376884422110553" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="538.0" prefWidth="797.0" VBox.vgrow="ALWAYS">
+         <items>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <VBox alignment="CENTER">
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" top="10.0" />
-                     </padding>
-                     <children>
-                        <Label text="Port Name" textAlignment="CENTER">
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin>
-                        </Label>
-                        <HBox alignment="CENTER" spacing="5.0">
-                           <children>
-                              <ChoiceBox fx:id="portsDropdown">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ChoiceBox>
-                              <ImageView fitHeight="15.0" fitWidth="24.0" onMouseClicked="#refresh" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@refresh.png" />
-                                 </image>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </ImageView>
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" spacing="5.0">
-                           <children>
-                              <Button fx:id="connectButton" mnemonicParsing="false" onAction="#connect" text="Connect" textAlignment="CENTER">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </Button>
-                              <Button fx:id="disconnectButton" mnemonicParsing="false" onAction="#disconnect" text="Disconnect" textAlignment="CENTER">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </Button>
-                           </children>
-                           <VBox.margin>
-                              <Insets top="5.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <Label text="Input" textAlignment="CENTER">
-                           <VBox.margin>
-                              <Insets bottom="5.0" top="25.0" />
-                           </VBox.margin>
-                        </Label>
-                        <TextField fx:id="inputTextField" onKeyPressed="#bindEnterToSend" />
-                        <HBox alignment="CENTER" spacing="5.0">
-                           <children>
-                              <Button fx:id="sendButton" mnemonicParsing="false" onAction="#send" text="Send" textAlignment="CENTER">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </Button>
-                              <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clear" text="Clear" textAlignment="CENTER">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </Button>
-                           </children>
-                           <VBox.margin>
-                              <Insets top="5.0" />
-                           </VBox.margin>
-                        </HBox>
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" GridPane.columnIndex="1">
-                     <children>
-                        <Label text="Output" textAlignment="CENTER">
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin>
-                        </Label>
-                        <TextArea fx:id="outputTextArea" prefHeight="200.0" prefWidth="200.0" />
-                     </children>
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </padding>
-                  </VBox>
+                  <LineChart fx:id="lineChart" layoutX="6.0" title="Particle flux over time" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <xAxis>
+                      <CategoryAxis label="Time (s)" prefHeight="45.0" side="BOTTOM" fx:id="xAxis">
+                         <opaqueInsets>
+                            <Insets />
+                         </opaqueInsets>
+                      </CategoryAxis>
+                    </xAxis>
+                    <yAxis>
+                      <NumberAxis fx:id="yAxis" label="Flux (CPM)" prefWidth="45.0" side="LEFT">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </NumberAxis>
+                    </yAxis>
+                  </LineChart>
                </children>
-            </GridPane>
-         </children>
-      </AnchorPane>
-   </items>
-</SplitPane>
+            </AnchorPane>
+            <AnchorPane>
+               <children>
+                  <GridPane alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="ALWAYS" maxWidth="167.0" minWidth="10.0" percentWidth="25.0" prefWidth="109.0" />
+                      <ColumnConstraints hgrow="ALWAYS" maxWidth="103.0" minWidth="10.0" percentWidth="75.0" prefWidth="91.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+                    </rowConstraints>
+                     <children>
+                        <VBox alignment="CENTER">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" top="10.0" />
+                           </padding>
+                           <children>
+                              <Label text="Port Name" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <HBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <ChoiceBox fx:id="portsDropdown">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </ChoiceBox>
+                                    <ImageView fitHeight="15.0" fitWidth="24.0" onMouseClicked="#refresh" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@refresh.png" />
+                                       </image>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </ImageView>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Button fx:id="connectButton" mnemonicParsing="false" onAction="#connect" text="Connect" textAlignment="CENTER">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
+                                    <Button fx:id="disconnectButton" mnemonicParsing="false" onAction="#disconnect" text="Disconnect" textAlignment="CENTER">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <Label text="Input" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" top="25.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <TextField fx:id="inputTextField" onKeyPressed="#bindEnterToSend" />
+                              <HBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Button fx:id="sendButton" mnemonicParsing="false" onAction="#send" text="Send" textAlignment="CENTER">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
+                                    <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clear" text="Clear" textAlignment="CENTER">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER" GridPane.columnIndex="1">
+                           <children>
+                              <Label text="Output" textAlignment="CENTER">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <TextArea fx:id="outputTextArea" prefHeight="200.0" prefWidth="200.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </GridPane>
+               </children>
+            </AnchorPane>
+         </items>
+      </SplitPane>
+   </children>
+</VBox>
