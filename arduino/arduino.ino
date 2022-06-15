@@ -25,7 +25,7 @@ void setup() {
   pinMode(powerPin, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(interruptPin), tubePulse, FALLING);
 
-  Serial.println("--------- SERIAL GEIGER COUNTER v1.1.0 ---------");
+  Serial.println("--------- SERIAL GEIGER COUNTER v1.2.0 ---------");
   Serial.println("Type 's' to start/stop the program");
 
   Serial.print("Format: execution_time");
