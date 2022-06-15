@@ -15,18 +15,20 @@ public class Application extends javafx.application.Application {
         Scene scene = new Scene(fxmlLoader.load());
         Controller controller = fxmlLoader.getController();
 
+        controller.setHostServices(getHostServices());
+        controller.setStage(stage);
+
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png"), "No icon resource"));
         stage.getIcons().add(icon);
 
         stage.setTitle("Serial Geiger Counter");
 
         stage.setOnCloseRequest(e -> {
-            controller.disconnect(null);
-            controller.executor.shutdownNow();
-            stage.close();
+            controller.exit(null);
         });
 
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 
